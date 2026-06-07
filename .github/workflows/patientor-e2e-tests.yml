@@ -8,6 +8,9 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-jammy
+      options: --ipc=host
 
     steps:
     - name: Checkout code
@@ -20,7 +23,7 @@ jobs:
 
     - name: Install patientor backend dependencies
       working-directory: ./patientor/backend
-      run: npm install --legacy-peer-deps
+      run: npm ci --legacy-peer-deps
 
     - name: Start patientor backend
       working-directory: ./patientor/backend
@@ -28,7 +31,7 @@ jobs:
 
     - name: Install patientor frontend dependencies
       working-directory: ./patientor/frontend
-      run: npm install --legacy-peer-deps
+      run: npm ci --legacy-peer-deps
 
     - name: Build patientor frontend
       working-directory: ./patientor/frontend
@@ -40,11 +43,7 @@ jobs:
 
     - name: Install e2e test dependencies
       working-directory: ./patientor-tests
-      run: npm install 
-
-    - name: Install Playwright browsers
-      working-directory: ./patientor-tests
-      run: npx playwright install chromium
+      run: npm ci
 
     - name: Wait for servers to start
       run: npx wait-on http://localhost:3001/api/ping http://localhost:5173 --timeout 60000

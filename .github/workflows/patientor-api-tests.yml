@@ -8,6 +8,9 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.60.0-jammy
+      options: --ipc=host
 
     steps:
     - name: Checkout code
@@ -20,7 +23,7 @@ jobs:
 
     - name: Install patientor backend dependencies
       working-directory: ./patientor/backend
-      run: npm install --legacy-peer-deps
+      run: npm ci --legacy-peer-deps
 
     - name: Lint patientor backend
       working-directory: ./patientor/backend
@@ -35,11 +38,7 @@ jobs:
 
     - name: Install test dependencies
       working-directory: ./patientor-api-tests
-      run: npm install
-
-    - name: Install Playwright browsers
-      working-directory: ./patientor-api-tests
-      run: npx playwright install chromium
+      run: npm ci
 
     - name: Run API tests
       working-directory: ./patientor-api-tests

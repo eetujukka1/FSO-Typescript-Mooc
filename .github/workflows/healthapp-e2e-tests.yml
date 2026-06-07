@@ -8,6 +8,9 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-jammy
+      options: --ipc=host
     
     steps:
     - name: Checkout code
@@ -20,7 +23,7 @@ jobs:
     
     - name: Install healthapp dependencies
       working-directory: ./healthapp
-      run: npm install
+      run: npm ci
     
     - name: Lint healthapp
       working-directory: ./healthapp
@@ -35,11 +38,7 @@ jobs:
     
     - name: Install test dependencies
       working-directory: ./healthapp-tests
-      run: npm install
-    
-    - name: Install Playwright browsers
-      working-directory: ./healthapp-tests
-      run: npx playwright install chromium
+      run: npm ci
     
     - name: Run e2e tests
       working-directory: ./healthapp-tests
