@@ -12,4 +12,10 @@ export default defineConfig({
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
+  webServer: {
+    command: 'npm start',
+    cwd: '../healthapp',
+    url: 'http://localhost:3000/hello',
+    reuseExistingServer: !process.env.CI,
+  },
 });
