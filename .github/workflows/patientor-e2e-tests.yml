@@ -6,7 +6,8 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
 
     steps:
     - name: Checkout code
@@ -43,7 +44,7 @@ jobs:
 
     - name: Install Playwright browsers
       working-directory: ./patientor-tests
-      run: npx playwright install --with-deps chromium
+      run: npx playwright install chromium
 
     - name: Wait for servers to start
       run: npx wait-on http://localhost:3001/api/ping http://localhost:5173 --timeout 60000
