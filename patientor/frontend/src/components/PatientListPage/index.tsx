@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box, Table, Button, TableHead, Typography, TableCell, TableRow, TableBody } from '@mui/material';
+import { Link } from "react-router-dom";
 import axios from 'axios';
 
 import { PatientFormValues, Patient } from "../../types";
@@ -54,7 +55,7 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
           Patient list
         </Typography>
       </Box>
-      <Table sx={{ marginBottom: "1em" }}>
+      <Table style={{ marginBottom: "1em" }}>
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
@@ -66,7 +67,7 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
         <TableBody>
           {Object.values(patients).map((patient: Patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
+              <TableCell><Link to={`/${patient.id}`}>{patient.name}</Link></TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell>{patient.occupation}</TableCell>
               <TableCell>
