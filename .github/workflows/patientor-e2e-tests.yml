@@ -25,10 +25,6 @@ jobs:
       working-directory: ./patientor/backend
       run: npm ci --legacy-peer-deps
 
-    - name: Start patientor backend
-      working-directory: ./patientor/backend
-      run: npm start &
-
     - name: Install patientor frontend dependencies
       working-directory: ./patientor/frontend
       run: npm ci --legacy-peer-deps
@@ -37,20 +33,44 @@ jobs:
       working-directory: ./patientor/frontend
       run: npm run build
 
-    - name: Start patientor frontend preview
-      working-directory: ./patientor/frontend
-      run: npx vite preview --port 5173 &
-
     - name: Install e2e test dependencies
       working-directory: ./patientor-tests
       run: npm ci
 
-    - name: Wait for servers to start
-      run: npx wait-on http://localhost:3001/api/ping http://localhost:5173 --timeout 60000
-
     - name: Run E2E tests
-      working-directory: ./patientor-tests
-      run: npm test
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        cleanup() {
+          kill "$(cat /tmp/patientor-backend.pid)" 2>/dev/null || true
+          kill "$(cat /tmp/patientor-frontend.pid)" 2>/dev/null || true
+        }
+
+        trap cleanup EXIT
+
+        (
+          cd patientor/backend
+          npm start > /tmp/patientor-backend.log 2>&1 &
+          echo $! > /tmp/patientor-backend.pid
+        )
+
+        (
+          cd patientor/frontend
+          npm run preview -- --host 127.0.0.1 --port 5173 > /tmp/patientor-frontend.log 2>&1 &
+          echo $! > /tmp/patientor-frontend.pid
+        )
+
+        if ! npx wait-on http://localhost:3001/api/ping http://127.0.0.1:5173 --timeout 60000; then
+          echo "Patientor backend log:"
+          cat /tmp/patientor-backend.log || true
+          echo "Patientor frontend log:"
+          cat /tmp/patientor-frontend.log || true
+          exit 1
+        fi
+
+        cd patientor-tests
+        npm test
 
     - name: Upload test report
       uses: actions/upload-artifact@v5
